@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.SwitchCompat;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -17,6 +18,9 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -43,9 +47,13 @@ public class MainActivity extends AppCompatActivity {
     char mCharDelimiter = '\n';
     byte[] readBuffer;
     int readBufferPosition;
-    AppCompatImageView btn_bluetooth;
 
-    /**
+
+    AppCompatImageView btn_bluetooth;
+    SwitchCompat switch_auto, switch_control;                   // @SEO 자동 제어스위치, 창문제어 스위치 제어를 위한 변수할당
+    TextView txt_isWindow, txt_gasValue, txt_rainValue;         // @SEO 창문상태, 가스센서값, 빗물 센서값을 제어를 위한 변수할당
+
+    /** @SEO
      * [1] onCraete 함수
      * - 어플리케이션이 처음 켜질때 읽는 함수입니다.
      * 현재 하고 있는 기능
@@ -58,8 +66,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btn_bluetooth = findViewById(R.id.btn_bluetooth);
-        btn_bluetooth.setOnClickListener(new ButtonClickListener());
+        btn_bluetooth = findViewById(R.id.btn_bluetooth);               // @SEO 블루투스 버튼아이디 할당
+        switch_auto = findViewById(R.id.switch_auto);                   // @SEO 자동스위치 아이디 할당
+        switch_control = findViewById(R.id.switch_control);              // @SEO 창문제어스위치 아이디 할당
+        txt_isWindow = findViewById(R.id.txt_isWindow);                 // @SEO 창문상태 텍스트뷰 아이디할당
+        txt_gasValue = findViewById(R.id.txt_gasValue);                 // @SEO 가스값 텍스트뷰 아이디할당
+        txt_rainValue = findViewById(R.id.txt_rainValue);               // @SEO 빗물 텍스트뷰 아이디할당
+
+        btn_bluetooth.setOnClickListener(new ButtonClickListener());         // @SEO 블루투스 리스너이벤트 장착
+        switch_auto.setOnCheckedChangeListener(new SwitchClickListener());
+        switch_control.setOnCheckedChangeListener(new SwitchClickListener());
+
+
         // 블루투스 이미지변경
         if(mRemoteDevice == null) btn_bluetooth.setImageDrawable(getResources().getDrawable(R.drawable.bluetooth_enable));
 
@@ -87,6 +105,26 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    class SwitchClickListener implements CompoundButton.OnCheckedChangeListener{
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            switch (compoundButton.getId()){
+                case R.id.switch_auto :
+                    Log.i("seo","auto status : " + b);
+                    if(b == true)  sendData("1");
+                    else sendData("2");
+                    break;
+                case R.id.switch_control :
+                    Log.i("seo","control status : " + b);
+                    if(b == true)  sendData("F");
+                    else sendData("0");
+
+                    break;
+            }
+        }
+    }
+
     /**
      * [2]
      *  checkBluetooth() 설명: 휴대폰이 블루투스가 활성화 되어있는지를 검사하고
@@ -228,7 +266,32 @@ public class MainActivity extends AppCompatActivity {
                                     handler.post(new Runnable(){
                                         // 아두이노로부터 들어온 수신데이터
                                         public void run(){
-                                            Log.i("seo","data : " + data);
+                                            String result[] = data.split("/"); // @SEO   1. GAS/123 혹은 RAIN/123.. 이런식으로 들어오는것중 / 를 기준으로 잘라 배열로 저장합니다.
+                                            String sensor = result[0];                //        2. 그중에 앞에것만 잘라서 따로저장합니다. ex) GAS , RAIN => 아두이노로부터 받은 센서의 종류를 뜻합니다
+                                            String value = result[1];                 //        3. 그중에 뒤에것만 잘라서 따로 저장합니다. ex) 123, 123 => 아두이노로부터 받은 센서의 값을 뜻합니다.
+                                            switch (sensor){
+                                                case "RAIN":
+                                                    txt_rainValue.setText(value);
+                                                    break;
+                                                case "GAS" :
+                                                    txt_gasValue.setText(value);
+                                                    break;
+                                                case "WINDOW" :
+                                                    Log.i("seo","data : " + data);
+                                                    switch (value){
+                                                        case "1" :
+                                                        case "true":
+                                                            Log.i("seo","1");
+                                                            break;
+                                                        case "0" :
+                                                            Log.i("seo","2");
+                                                            break;
+                                                        default:
+                                                            Log.i("seo","value : " + 123);
+
+                                                    }
+                                                    break;
+                                            }
                                         }
                                     });
                                 }
@@ -288,8 +351,6 @@ public class MainActivity extends AppCompatActivity {
 
         super.onDestroy();
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
