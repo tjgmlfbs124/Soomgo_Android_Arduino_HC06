@@ -1,0 +1,98 @@
+#include <Stepper.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial BTSerial(8, 9); 
+
+const int stepsPerRevolution = 400; //회전수 200/한바퀴
+Stepper myStepper(stepsPerRevolution, 3,4,6,7);
+int ENA=2;
+int ENB=5;
+
+const int gasPin = A0;
+const int rainPin = A1;
+
+boolean isAuto = false;  // @SEO 자동제어 false = OFF / true = ON
+boolean isWindow = false; //false -> 닫혀있는상태 true -> 열려있는상태
+
+void setup() {
+  Serial.begin(9600);
+  BTSerial.begin(9600); 
+  myStepper.setSpeed(30);
+  pinMode(ENA,OUTPUT); 
+  pinMode(ENB,OUTPUT);
+  pinMode(gasPin, INPUT);
+  pinMode(rainPin, INPUT);
+  digitalWrite(ENA,HIGH);
+  digitalWrite(ENB,HIGH);
+}
+
+void loop() {
+  // @SEO 휴대폰에서 블루투스로 데이터가 전송됬을때
+  while(BTSerial.available() > 0)
+  {
+      char response = BTSerial.read();
+      runActon(response);   // @SEO 블루투스값에 따라 행동을 제어하는 함수
+  }
+
+  checkAutoWindow(isAuto);  // @SEO 자동제어 체크하고, 창문을 제어하는 함수
+  sendSensorValue();        // @SEO 센서값을 블루투스로 전송하는 함수
+
+  delay(200);
+}
+
+// @SEO 자동제어 상태값에 따라 자동제어를 담당하는 함수
+void checkAutoWindow(bool mAuto){
+  if(mAuto == true){
+    /** @SEO
+     * 가스값에 따라 창문 자동제어 ON
+     */
+  }
+}
+
+// @SEO Sensor값 블루투스 전송
+void sendSensorValue(){
+  String rain = "RAIN/";
+  String gas = "GAS/";
+  String window = "WINDOW/";
+
+  String rain_value = String(analogRead(rainPin));
+  String gas_value = String(analogRead(gasPin));
+
+  // @SEO 가스값, 빗물값, 창문상태 전송
+  BTSerial.println(gas + gas_value);        // @SEO ex) GAS/1234
+  BTSerial.println(rain + rain_value);      // @SEO ex) RAIN/1234
+  BTSerial.println(window + String(isWindow));  // @SEO ex) WINDOW/true, WINDOW/false
+}
+
+// 휴대폰으로 받은 블루투스 값에 따라 행동하는 함수
+void runActon(char command){
+  switch(command){
+    case 'F' : // @SEO 창문 열기명령
+      sensor_open();
+      break;
+      
+    case '0' : // @SEO 창문 닫기명령
+      sensor_close();
+      break;
+    case '1' : // @SEO 창문 자동제어 on
+      Serial.println("Auto On");
+      isAuto = true;
+      break;
+    case '2' :  // @SEO 창문 자동제어 off
+      Serial.println("Auto Off");
+      isAuto = false;
+      break;
+  }
+}
+
+void sensor_open(){
+  Serial.println("window Open");
+  myStepper.step(stepsPerRevolution);
+  isWindow = true;
+}
+
+void sensor_close(){
+  Serial.println("window Close");
+  myStepper.step(-stepsPerRevolution);
+  isWindow = false;
+}
