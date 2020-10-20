@@ -5,166 +5,136 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity"
     android:background="#f5f5f5">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="#3471eb"
-        android:text="앱 이름"
-        android:gravity="center"
-        android:textSize="15dp"
-        android:textColor="#ffffff"/>
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/btn_bluetooth"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/bluetooth_enable"
-        android:layout_margin="10dp"
-        android:background="#3471eb"
-        android:padding="5dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Window"
-        android:textColor="#777"
-        android:textSize="20dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/txt_isWindow"/>
-
-    <TextView
-        android:id="@+id/txt_isWindow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="-"
-        android:textColor="#777"
-        android:textSize="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/auto_layout"
-        app:layout_constraintTop_toTopOf="@id/btn_bluetooth"/>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/auto_layout"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="#31b3eb"
-        app:layout_constraintBottom_toTopOf="@id/control_layout">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="30px"
-            android:gravity="center"
-            android:text="자동제어 : -"
-            android:textColor="#fff"
-            android:textSize="15dp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent" />
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switch_auto"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            app:layout_constraintRight_toRightOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/control_layout"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="#31b3eb"
-        app:layout_constraintBottom_toTopOf="@id/sensorLayout">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginLeft="30px"
-            android:gravity="center"
-            android:textColor="#fff"
-            android:textStyle="bold"
-            android:textSize="15dp"
-            android:text="창문 명령 : -"/>
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switch_control"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            app:layout_constraintRight_toRightOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <LinearLayout
-        android:id="@+id/sensorLayout"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#3471eb"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center|bottom"
-                android:text="가스센서"
-                android:layout_weight="1"
-                android:textSize="12dp"
-                android:textColor="#ffffff"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/txt_gasValue"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center|top"
-                android:text="0"
-                android:layout_weight="1"
-                android:textSize="25dp"
-                android:textColor="#ffffff"
-                android:textStyle="bold"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#3471eb"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center|bottom"
-                android:text="빗물센서"
-                android:layout_weight="1"
-                android:textSize="12dp"
-                android:textColor="#ffffff"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/txt_rainValue"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center|top"
-                android:text="0"
-                android:layout_weight="1"
-                android:textSize="25dp"
-                android:textColor="#ffffff"
-                android:textStyle="bold"/>
-        </LinearLayout>
-
+        android:id="@+id/bluetoothLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="블루투스"
+            android:textSize="25dp"
+            android:layout_marginRight="20dp"/>
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/btn_bluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/windowLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/bluetoothLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="현재 창문상태 : "
+            android:layout_marginRight="20dp"
+            android:textSize="20dp"/>
+        <TextView
+            android:id="@+id/txt_isWindow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"/>
+    </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/rainLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/windowLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="빗물센서값 : "
+            android:layout_marginRight="20dp"
+            android:textSize="20dp"/>
+        <TextView
+            android:id="@+id/txt_rainValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"/>
+    </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/gasLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/rainLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="가스센서값 : "
+            android:layout_marginRight="20dp"
+            android:textSize="20dp"/>
+        <TextView
+            android:id="@+id/txt_gasValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/autoControlLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/gasLayout">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:layout_marginRight="20dp"
+            android:text="자동제어"/>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switch_auto"
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/autoControlLayout">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="열기"
+            android:layout_marginRight="20dp"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="닫기"/>
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

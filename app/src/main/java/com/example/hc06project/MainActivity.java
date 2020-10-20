@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatToggleButton;
 import androidx.appcompat.widget.SwitchCompat;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHeadset;
@@ -49,9 +51,10 @@ public class MainActivity extends AppCompatActivity {
     int readBufferPosition;
 
 
-    AppCompatImageView btn_bluetooth;
+    AppCompatToggleButton btn_bluetooth;
     SwitchCompat switch_auto, switch_control;                   // @SEO 자동 제어스위치, 창문제어 스위치 제어를 위한 변수할당
     TextView txt_isWindow, txt_gasValue, txt_rainValue;         // @SEO 창문상태, 가스센서값, 빗물 센서값을 제어를 위한 변수할당
+    ProgressDialog progressDialog;                              // @SEO 로딩바 변수
 
     /** @SEO
      * [1] onCraete 함수
@@ -68,18 +71,21 @@ public class MainActivity extends AppCompatActivity {
 
         btn_bluetooth = findViewById(R.id.btn_bluetooth);               // @SEO 블루투스 버튼아이디 할당
         switch_auto = findViewById(R.id.switch_auto);                   // @SEO 자동스위치 아이디 할당
-        switch_control = findViewById(R.id.switch_control);              // @SEO 창문제어스위치 아이디 할당
+//        switch_control = findViewById(R.id.switch_control);              // @SEO 창문제어스위치 아이디 할당
         txt_isWindow = findViewById(R.id.txt_isWindow);                 // @SEO 창문상태 텍스트뷰 아이디할당
         txt_gasValue = findViewById(R.id.txt_gasValue);                 // @SEO 가스값 텍스트뷰 아이디할당
         txt_rainValue = findViewById(R.id.txt_rainValue);               // @SEO 빗물 텍스트뷰 아이디할당
 
-        btn_bluetooth.setOnClickListener(new ButtonClickListener());         // @SEO 블루투스 리스너이벤트 장착
+//        btn_bluetooth.setOnClickListener(new ButtonClickListener());         // @SEO 블루투스 리스너이벤트 장착
         switch_auto.setOnCheckedChangeListener(new SwitchClickListener());
-        switch_control.setOnCheckedChangeListener(new SwitchClickListener());
+//        switch_control.setOnCheckedChangeListener(new SwitchClickListener());
+
+        progressDialog = new ProgressDialog(this); // @SEO 창문제어할때 빙빙도는 ui 생성
+
 
 
         // 블루투스 이미지변경
-        if(mRemoteDevice == null) btn_bluetooth.setImageDrawable(getResources().getDrawable(R.drawable.bluetooth_enable));
+//        if(mRemoteDevice == null) btn_bluetooth.setImageDrawable(getResources().getDrawable(R.drawable.bluetooth_enable));
 
     }
 
@@ -99,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,"연결을 해제하였습니다.",Toast.LENGTH_SHORT).show();
 
                     // 블루투스 이미지변경
-                    btn_bluetooth.setImageDrawable(getResources().getDrawable(R.drawable.bluetooth_enable));
+//                    btn_bluetooth.setImageDrawable(getResources().getDrawable(R.drawable.bluetooth_enable));
                 }catch(Exception e){}
 
             }
@@ -115,12 +121,13 @@ public class MainActivity extends AppCompatActivity {
                     if(b == true)  sendData("1");
                     else sendData("2");
                     break;
-                case R.id.switch_control :
-                    Log.i("seo","control status : " + b);
-                    if(b == true)  sendData("F");
-                    else sendData("0");
-
-                    break;
+//                case R.id.switch_control :
+//                    progressDialog.show();
+//                    Log.i("seo","control status : " + b);
+//                    if(b == true)  sendData("F");
+//                    else sendData("0");
+//
+//                    break;
             }
         }
     }
@@ -225,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
             beginListenForData();
 
             // 블루투스 이미지변경
-            btn_bluetooth.setImageDrawable(getResources().getDrawable(R.drawable.bluetooth_disable));
+//            btn_bluetooth.setImageDrawable(getResources().getDrawable(R.drawable.bluetooth_disable));
 
         }catch (Exception e){
             Toast.makeText(MainActivity.this,"연결을 실패했습니다.",Toast.LENGTH_SHORT).show();
@@ -251,6 +258,8 @@ public class MainActivity extends AppCompatActivity {
             public void run(){
                 while(!Thread.currentThread().isInterrupted()){
                     try {
+                        // @SEO 로딩 UI가 돌고 있으면 취소하기
+
                         int bytesAvailable = mInputStream.available(); // 수신 데이터 확인
                         if(bytesAvailable > 0){ // 데이터가 수신된 경우
                             byte[] packetBytes = new byte[bytesAvailable];
@@ -258,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
                             for(int i = 0; i < bytesAvailable; i++){
                                 byte b = packetBytes[i];
                                 if(b == mCharDelimiter){
+                                    progressDialog.dismiss();
                                     byte[] encodedBytes = new byte[readBufferPosition];
                                     System.arraycopy(readBuffer, 0,
                                             encodedBytes, 0, encodedBytes.length);
@@ -270,25 +280,30 @@ public class MainActivity extends AppCompatActivity {
                                             String sensor = result[0];                //        2. 그중에 앞에것만 잘라서 따로저장합니다. ex) GAS , RAIN => 아두이노로부터 받은 센서의 종류를 뜻합니다
                                             String value = result[1];                 //        3. 그중에 뒤에것만 잘라서 따로 저장합니다. ex) 123, 123 => 아두이노로부터 받은 센서의 값을 뜻합니다.
                                             switch (sensor){
-                                                case "RAIN":
+                                                case "RAIN": // @SEO 빗물감지값
                                                     txt_rainValue.setText(value);
                                                     break;
-                                                case "GAS" :
+                                                case "GAS" : // @SEO 가스값
                                                     txt_gasValue.setText(value);
                                                     break;
-                                                case "WINDOW" :
+                                                case "WINDOW" : // @SEO 창문제어 상태값
                                                     Log.i("seo","data : " + data);
-                                                    switch (value){
-                                                        case "1" :
-                                                        case "true":
-                                                            Log.i("seo","1");
-                                                            break;
-                                                        case "0" :
-                                                            Log.i("seo","2");
-                                                            break;
-                                                        default:
-                                                            Log.i("seo","value : " + 123);
-
+                                                    if( data.indexOf("1") > -1){ // 문장에 1이 포함되어있다면 ex WINDOW/1
+                                                        txt_isWindow.setText("열림");
+//                                                        switch_control.setChecked(true);
+                                                    }                            // 문장에 1이 포함되어 있지않다면 ex WINDOW/0
+                                                    else { // 문장에 0이 포함되어있다면
+                                                        txt_isWindow.setText("닫힘");
+//                                                        switch_control.setChecked(false);
+                                                    }
+                                                    break;
+                                                case "AUTO" : // @SEO 자동제어 상태값
+                                                    Log.i("seo","data : " + data);
+                                                    if( data.indexOf("1") > -1){ // 문장에 1이 포함되어있다면 ex AUTO/1
+                                                        switch_auto.setChecked(true);
+                                                    }
+                                                else {                          // 문장에 0이 포함되어있다면 ex AUTO/0
+                                                        switch_auto.setChecked(false);
                                                     }
                                                     break;
                                             }
