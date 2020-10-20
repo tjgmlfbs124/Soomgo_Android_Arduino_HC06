@@ -54,14 +54,16 @@ void sendSensorValue(){
   String rain = "RAIN/";
   String gas = "GAS/";
   String window = "WINDOW/";
+  String autoControl = "AUTO/";
 
   String rain_value = String(analogRead(rainPin));
   String gas_value = String(analogRead(gasPin));
 
   // @SEO 가스값, 빗물값, 창문상태 전송
-  BTSerial.println(gas + gas_value);        // @SEO ex) GAS/1234
-  BTSerial.println(rain + rain_value);      // @SEO ex) RAIN/1234
-  BTSerial.println(window + String(isWindow));  // @SEO ex) WINDOW/true, WINDOW/false
+  BTSerial.println(gas + gas_value);                // @SEO ex) GAS/1234
+  BTSerial.println(rain + rain_value);              // @SEO ex) RAIN/1234
+  BTSerial.println(window + String(isWindow));      // @SEO ex) WINDOW/true, WINDOW/false
+  BTSerial.println(autoControl + String(isAuto));   // @SEO ex) AUTO/true, AUTO/false
 }
 
 // 휴대폰으로 받은 블루투스 값에 따라 행동하는 함수
